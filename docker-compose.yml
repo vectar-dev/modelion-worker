@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  node_modelion:
+    build: .
+    volumes:
+      - .:/app
+      - ./node_modules:/app/node_modules
+    working_dir: /app
+    container_name: node_modelion
+    env_file: .env
+    networks:
+      - app-network
+    restart: always
+
+  nginx_modelion:
+    image: nginx:mainline-alpine
+    container_name: nginx_modelion
+    env_file: .env
+    ports:
+      - $PORT:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/static:/static/
+    depends_on:
+      - node_modelion
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
